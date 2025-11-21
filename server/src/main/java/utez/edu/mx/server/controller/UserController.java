@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.server.modules.UserDto;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/sgu-api/users")
 @CrossOrigin("*")
 public class UserController {
     @Autowired

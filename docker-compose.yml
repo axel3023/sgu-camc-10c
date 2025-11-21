@@ -48,14 +48,12 @@ services:
     depends_on:
       - frontend
 
-# Aquí se configuran las redes donde se comunican los contenedores
-# docker network create --driver bridge sgu-net
+
 networks:
   sgu-net:
     external: true
 
-# Aquí se configura los volúmenes ue ocupan los contenedores
-# docker volume create sgu-volume
+
 volumes:
   sgu-volume: 
     external: true

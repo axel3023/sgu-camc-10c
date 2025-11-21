@@ -1,5 +1,5 @@
 #Recursos
-FROM node:20 alpine AS build
+FROM node:20  AS build
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ ARG API_PORT
 ARG API_BASE
 
 ENV VITE_API_HOST=$API_HOST
-ENV VITE_API_HOST=$API_PORT
+ENV VITE_API_PORT=$API_PORT
 ENV VITE_API_BASE=$API_BASE
 
 RUN npm run build
@@ -27,4 +27,4 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
-cdm ["nginx","-g","daemon off;"]
+cmd ["nginx","-g","daemon off;"]

@@ -17,11 +17,11 @@ const CloseIcon = () => (
 function App() {
   const [users, setUsers] = useState([]);
   
+  // ESTADO ORIGINAL: Usando 'correo' y 'tel' como en tu Java
   const [createFormData, setCreateFormData] = useState({ name: '', correo: '', tel: '' });
-  
   const [editFormData, setEditFormData] = useState({ name: '', correo: '', tel: '' });
-  const [editingUserId, setEditingUserId] = useState(null);
   
+  const [editingUserId, setEditingUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -38,6 +38,7 @@ function App() {
     }
   };
 
+  // --- CREAR ---
   const handleCreateChange = (e) => {
     const { name, value } = e.target;
     setCreateFormData((prev) => ({ ...prev, [name]: value }));
@@ -45,19 +46,27 @@ function App() {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
-    await UserController.createUser(createFormData);
-    setCreateFormData({ name: '', correo: '', tel: '' }); // Limpiar form de crear
-    loadUsers();
+    try {
+        // Enviamos { name, correo, tel } -> Coincide con tu Java
+        await UserController.createUser(createFormData);
+        setCreateFormData({ name: '', correo: '', tel: '' }); 
+        loadUsers();
+    } catch (error) {
+        console.error("Error al crear:", error);
+        alert("Error. Verifica que el correo no exista y el teléfono no sea muy largo.");
+    }
   };
 
+  // --- EDITAR (MODAL) ---
   const handleEditClick = (user) => {
+    // Llenamos el modal con los datos actuales
     setEditFormData({
       name: user.name,
-      correo: user.correo,
+      correo: user.correo, 
       tel: user.tel,
     });
     setEditingUserId(user.id);
-    setIsModalOpen(true); 
+    setIsModalOpen(true);
   };
 
   const handleEditChange = (e) => {
@@ -68,14 +77,20 @@ function App() {
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     if (editingUserId) {
-      await UserController.updateUser(editingUserId, editFormData);
-      setIsModalOpen(false); 
-      setEditingUserId(null);
-      loadUsers();
+      try {
+        await UserController.updateUser(editingUserId, editFormData);
+        setIsModalOpen(false);
+        setEditingUserId(null);
+        loadUsers();
+      } catch (error) {
+        console.error("Error al actualizar:", error);
+      }
     }
   };
 
+  // --- ELIMINAR ---
   const handleDelete = async (id) => {
+    // eslint-disable-next-line no-restricted-globals
     if (confirm('¿Seguro que deseas eliminar este usuario?')) {
       await UserController.deleteUser(id);
       loadUsers();
@@ -86,6 +101,7 @@ function App() {
     <div style={styles.pageWrapper}>
       <div style={styles.container}>
         
+        {/* FORMULARIO DE CREAR (IZQUIERDA) */}
         <div style={styles.formCard}>
           <h2 style={styles.title}>Nuevo Usuario</h2>
           <form onSubmit={handleCreateSubmit} style={styles.form}>
@@ -103,9 +119,10 @@ function App() {
             </div>
             <div style={styles.inputGroup}>
               <label style={styles.label}>Correo electrónico</label>
+              {/* Usamos name="correo" */}
               <input
                 type="email"
-                name="correo"
+                name="correo" 
                 value={createFormData.correo}
                 onChange={handleCreateChange}
                 required
@@ -115,6 +132,7 @@ function App() {
             </div>
             <div style={styles.inputGroup}>
               <label style={styles.label}>Teléfono</label>
+              {/* Usamos name="tel" */}
               <input
                 type="text"
                 name="tel"
@@ -122,7 +140,7 @@ function App() {
                 onChange={handleCreateChange}
                 required
                 style={styles.input}
-                placeholder="555-000-1234"
+                placeholder="5551234567"
               />
             </div>
             <button type="submit" style={styles.saveButton}>
@@ -131,6 +149,7 @@ function App() {
           </form>
         </div>
 
+        {/* TABLA (DERECHA) */}
         <div style={styles.tableCard}>
           <h2 style={styles.title}>Directorio de Usuarios</h2>
           <div style={styles.tableResponsive}>
@@ -156,7 +175,7 @@ function App() {
                         <button 
                           onClick={() => handleEditClick(u)} 
                           style={styles.iconButton} 
-                          title="Editar en Modal"
+                          title="Editar"
                         >
                           <EditIcon />
                         </button>
@@ -173,7 +192,7 @@ function App() {
                 ))}
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan="5" style={styles.emptyState}>No hay usuarios registrados.</td>
+                     <td colSpan="5" style={styles.emptyState}>No hay usuarios registrados.</td>
                   </tr>
                 )}
               </tbody>
@@ -182,6 +201,7 @@ function App() {
         </div>
       </div>
 
+      {/* MODAL DE EDICIÓN */}
       {isModalOpen && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
@@ -208,7 +228,7 @@ function App() {
                 <label style={styles.label}>Correo electrónico</label>
                 <input
                   type="email"
-                  name="correo"
+                  name="correo" // Usamos correo
                   value={editFormData.correo}
                   onChange={handleEditChange}
                   required
@@ -219,7 +239,7 @@ function App() {
                 <label style={styles.label}>Teléfono</label>
                 <input
                   type="text"
-                  name="tel"
+                  name="tel" // Usamos tel
                   value={editFormData.tel}
                   onChange={handleEditChange}
                   required
@@ -239,16 +259,14 @@ function App() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
 const styles = {
- 
   pageWrapper: {
     minHeight: '100vh',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f8f9fa', 
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
@@ -260,7 +278,7 @@ const styles = {
     gap: '2rem',
     width: '100%',
     maxWidth: '1200px',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap', 
   },
   formCard: {
     flex: 1,
@@ -268,7 +286,7 @@ const styles = {
     backgroundColor: '#ffffff',
     padding: '2rem',
     borderRadius: '12px',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
     height: 'fit-content',
   },
   tableCard: {
@@ -277,7 +295,7 @@ const styles = {
     backgroundColor: '#ffffff',
     padding: '2rem',
     borderRadius: '12px',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
   },
   title: {
     marginTop: 0,
@@ -296,8 +314,10 @@ const styles = {
     border: '1px solid #d1d5db',
     fontSize: '1rem',
     outline: 'none',
+    transition: 'border-color 0.2s',
   },
   saveButton: {
+    flex: 1,
     padding: '10px',
     backgroundColor: '#2563eb',
     color: 'white',
@@ -305,25 +325,52 @@ const styles = {
     borderRadius: '6px',
     fontWeight: 'bold',
     cursor: 'pointer',
-    flex: 1,
+    transition: 'background 0.2s',
   },
-  
+  cancelButton: {
+    padding: '10px 15px',
+    backgroundColor: '#e5e7eb',
+    color: '#374151',
+    border: 'none',
+    borderRadius: '6px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+  },
   tableResponsive: { overflowX: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' },
-  th: { textAlign: 'left', padding: '12px', borderBottom: '2px solid #e5e7eb', color: '#4b5563' },
+  th: {
+    textAlign: 'left',
+    padding: '12px',
+    borderBottom: '2px solid #e5e7eb',
+    color: '#4b5563',
+    fontWeight: '600',
+  },
   tr: { borderBottom: '1px solid #f3f4f6' },
   td: { padding: '12px', color: '#374151' },
   emptyState: { padding: '2rem', textAlign: 'center', color: '#9ca3af' },
-  actionButtonsContainer: { display: 'flex', justifyContent: 'center', gap: '8px' },
-  iconButton: { background: 'transparent', border: 'none', cursor: 'pointer', padding: '6px' },
-
+  actionButtonsContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '8px',
+  },
+  iconButton: {
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    padding: '6px',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'background 0.2s',
+  },
   modalOverlay: {
     position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -359,15 +406,6 @@ const styles = {
     display: 'flex',
     gap: '1rem',
     marginTop: '1rem'
-  },
-  cancelButton: {
-    padding: '10px 15px',
-    backgroundColor: '#e5e7eb',
-    color: '#374151',
-    border: 'none',
-    borderRadius: '6px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
   }
 };
 

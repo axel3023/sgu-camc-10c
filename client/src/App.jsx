@@ -17,7 +17,6 @@ const CloseIcon = () => (
 function App() {
   const [users, setUsers] = useState([]);
   
-  // ESTADO ORIGINAL: Usando 'correo' y 'tel' como en tu Java
   const [createFormData, setCreateFormData] = useState({ name: '', correo: '', tel: '' });
   const [editFormData, setEditFormData] = useState({ name: '', correo: '', tel: '' });
   

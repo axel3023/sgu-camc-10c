@@ -7,7 +7,7 @@ import utez.edu.mx.server.modules.UserDto;
 
 @RestController
 @RequestMapping("/sgu-api/users")
-@CrossOrigin("*")
+@CrossOrigin(origins= "*")
 public class UserController {
     @Autowired
     private UserService userService;
